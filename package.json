@@ -1,0 +1,22 @@
+{
+  "name": "rwbexp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon local.js",
+    "deploy": "serverless deploy -v",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "\\",
+  "license": "ISC",
+  "dependencies": {
+    "aws-serverless-express": "^3.3.8",
+    "express": "^4.17.1",
+    "node": "^14.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "serverless": "^1.78.1"
+  }
+}
