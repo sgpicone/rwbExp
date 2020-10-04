@@ -59,7 +59,7 @@
     "ApiLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/rwb-exp-production-api"
+        "LogGroupName": "/aws/lambda/rwb-exp-dev-api"
       }
     },
     "IamRoleLambdaExecution": {
@@ -88,7 +88,7 @@
                 "-",
                 [
                   "rwb-exp",
-                  "production",
+                  "dev",
                   "lambda"
                 ]
               ]
@@ -104,7 +104,7 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/rwb-exp-production*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/rwb-exp-dev*:*"
                     }
                   ]
                 },
@@ -115,7 +115,7 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/rwb-exp-production*:*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/rwb-exp-dev*:*:*"
                     }
                   ]
                 }
@@ -129,7 +129,7 @@
             "-",
             [
               "rwb-exp",
-              "production",
+              "dev",
               {
                 "Ref": "AWS::Region"
               },
@@ -146,9 +146,9 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/rwb-exp/production/1597619580240-2020-08-16T23:13:00.240Z/rwb-exp.zip"
+          "S3Key": "serverless/rwb-exp/dev/1598408817303-2020-08-26T02:26:57.303Z/rwb-exp.zip"
         },
-        "FunctionName": "rwb-exp-production-api",
+        "FunctionName": "rwb-exp-dev-api",
         "Handler": "lambda.universal",
         "MemorySize": 128,
         "Role": {
@@ -158,26 +158,34 @@
           ]
         },
         "Runtime": "nodejs12.x",
-        "Timeout": 10
+        "Timeout": 10,
+        "Environment": {
+          "Variables": {
+            "DB_HOST": "165.227.177.157",
+            "DB_PORT": "32947",
+            "DB_USER": "special_turd",
+            "DB_PASS": "IAmATurdLOLUMAD"
+          }
+        }
       },
       "DependsOn": [
         "ApiLogGroup"
       ]
     },
-    "ApiLambdaVersiontphu0aZ9e6ctIfK68tWFYlJN2VD2e7a0GBTRBk4l5I": {
+    "ApiLambdaVersione77bXnytgtXN23QQPWRt6aKhuGh2r2P6h5YBHIkA": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ApiLambdaFunction"
         },
-        "CodeSha256": "py6I4zz10EHad0zC68/H5moJFZH21TAjrhhLCgfaNq4="
+        "CodeSha256": "BDBP1wFROwTgzGpPYXEEIjD3BkFTr1tmgjRPzbYMS/U="
       }
     },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "Name": "production-rwb-exp",
+        "Name": "dev-rwb-exp",
         "EndpointConfiguration": {
           "Types": [
             "EDGE"
@@ -290,13 +298,13 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1597619544041": {
+    "ApiGatewayDeployment1598408796428": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         },
-        "StageName": "production"
+        "StageName": "dev"
       },
       "DependsOn": [
         "ApiGatewayMethodProxyVarAny",
@@ -350,7 +358,7 @@
     "ApiLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ApiLambdaVersiontphu0aZ9e6ctIfK68tWFYlJN2VD2e7a0GBTRBk4l5I"
+        "Ref": "ApiLambdaVersione77bXnytgtXN23QQPWRt6aKhuGh2r2P6h5YBHIkA"
       }
     },
     "ServiceEndpoint": {
@@ -371,7 +379,7 @@
             {
               "Ref": "AWS::URLSuffix"
             },
-            "/production"
+            "/dev"
           ]
         ]
       }
