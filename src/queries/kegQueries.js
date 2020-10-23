@@ -35,10 +35,19 @@ const getKegs = async (connection) => {
 };
 
 const getKegDetailsById = async (connection, id) => {
-    return await connection.query(
+    const rows = await connection.query(
         `${KEG_DETAIL_SELECT}
     WHERE k.Id = ${id}
     group by k.RWBId;`);
+    const mapped = rows.map(row => {
+        const mapItem = { ...row };
+        mapItem.washHistory = JSON.parse(mapItem.washHistory);
+        mapItem.saleHistory = JSON.parse(mapItem.saleHistory);
+        mapItem.saniHistory = JSON.parse(mapItem.saniHistory);
+        return mapItem;
+    });
+    console.log(mapped[0]);
+    return mapped.length ? mapped[0] : mapped;
 };
 
 const findKegByRwbId = async (connection, rwbId) => {
