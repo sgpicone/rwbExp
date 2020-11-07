@@ -11,6 +11,17 @@ left join rwbbc_data.keg_sani_history ksh on k.RWBId = ksh.FK_RWBId
 left join rwbbc_data.Chemicals sc on ksh.FK_WashChemicalId = sc.Id
 left join rwbbc_data.keg_sale_history ksale on k.RWBId = ksale.FK_RWBId`;
 
+const KEG_DETAIL = `SELECT 
+k.* 
+from rwbbc_data.keg_info k`;
+
+/*
+SELECT WashDate, GROUP_CONCAT(c.name) FROM keg_wash_history kwh 
+JOIN Chemicals c ON kwh.FK_WashChemicalId = c.Id 
+WHERE kwh.FK_RWBId = 'RWB-6-001'
+GROUP BY kwh.WashDate;
+*/
+
 const getKegs = async (connection) => {
     const rows = await connection.query(`SELECT k.*, kwh.LastWashDate, ksh.LastSaniDate, ksales.LastSaleDate, kt.Type
     FROM rwbbc_data.keg_info k
@@ -34,20 +45,36 @@ const getKegs = async (connection) => {
     return rows;
 };
 
-const getKegDetailsById = async (connection, id) => {
-    const rows = await connection.query(
-        `${KEG_DETAIL_SELECT}
-    WHERE k.Id = ${id}
-    group by k.RWBId;`);
-    const mapped = rows.map(row => {
-        const mapItem = { ...row };
-        mapItem.washHistory = JSON.parse(mapItem.washHistory);
-        mapItem.saleHistory = JSON.parse(mapItem.saleHistory);
-        mapItem.saniHistory = JSON.parse(mapItem.saniHistory);
-        return mapItem;
-    });
-    console.log(mapped[0]);
-    return mapped.length ? mapped[0] : mapped;
+const getKegDetailsById = async (connection, kegId) => {
+    const query = `SELECT 
+    k.*
+    from rwbbc_data.keg_info k
+    where k.Id = ${kegId}
+    ORDER BY k.Id;
+
+    SELECT WashDate, GROUP_CONCAT(c.name) as WashChemicals
+    FROM rwbbc_data.keg_wash_history kwh 
+    JOIN rwbbc_data.Chemicals c ON kwh.FK_WashChemicalId = c.Id 
+    WHERE kwh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
+    GROUP BY kwh.WashDate;
+
+    SELECT SaniDate, GROUP_CONCAT(c.name) as SaniChemicals
+    FROM rwbbc_data.keg_sani_history ksh 
+    JOIN rwbbc_data.Chemicals c ON ksh.FK_SaniChemicalId = c.Id 
+    WHERE ksh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
+    GROUP BY ksh.SaniDate;
+
+    SELECT SaleDate, GROUP_CONCAT(FK_CustomerId) as Customers
+    FROM rwbbc_data.keg_sale_history ksh 
+    WHERE ksh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
+    GROUP BY ksh.SaleDate;
+    `
+    let results = await connection.query(query);
+    let keg = results[0][0];
+    keg.WashHistory = results[1];
+    keg.SaniHistory = results[2];
+    keg.SaleHistory = results[3];
+    return keg;
 };
 
 const findKegByRwbId = async (connection, rwbId) => {
@@ -109,6 +136,38 @@ const addKegSaleLog = async (connection, saleLog) => {
     return await connection.query(query);
 }
 
+const testGetKegs = async (connection, kegId) => {
+    const query = `SELECT 
+    k.*
+    from rwbbc_data.keg_info k
+    where k.Id = ${kegId}
+    ORDER BY k.Id;
+
+    SELECT WashDate, GROUP_CONCAT(c.name) as WashChemicals
+    FROM rwbbc_data.keg_wash_history kwh 
+    JOIN rwbbc_data.Chemicals c ON kwh.FK_WashChemicalId = c.Id 
+    WHERE kwh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
+    GROUP BY kwh.WashDate;
+
+    SELECT SaniDate, GROUP_CONCAT(c.name) as SaniChemicals
+    FROM rwbbc_data.keg_sani_history ksh 
+    JOIN rwbbc_data.Chemicals c ON ksh.FK_SaniChemicalId = c.Id 
+    WHERE ksh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
+    GROUP BY ksh.SaniDate;
+
+    SELECT SaleDate, GROUP_CONCAT(FK_CustomerId) as Customers
+    FROM rwbbc_data.keg_sale_history ksh 
+    WHERE ksh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
+    GROUP BY ksh.SaleDate;
+    `
+    let results = await connection.query(query);
+    let keg = results[0][0];
+    keg.WashHistory = results[1];
+    keg.SaniHistory = results[2];
+    keg.SaleHistory = results[3];
+    return keg;
+}
+
 module.exports = {
     getKegs: getKegs,
     getKegById: getKegDetailsById,
@@ -118,5 +177,6 @@ module.exports = {
     addKegWashLog: addKegWashLog,
     addKegSaniLog: addKegSaniLog,
     addKegFillLog: addKegFillLog,
-    addKegSaleLog: addKegSaleLog
+    addKegSaleLog: addKegSaleLog,
+    testGetKegs: testGetKegs
 };
