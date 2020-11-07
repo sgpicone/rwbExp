@@ -3,14 +3,15 @@ const dbFactory = require('../dbFactory');
 
 console.error(process.env.DB_HOST);
 var connection = dbFactory.makeDb({
-    host     : process.env.DB_HOST,
-    port     : process.env.DB_PORT,
-    user     : process.env.DB_USER,
-    password : process.env.DB_PASS
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    multipleStatements: true
 });
 
 exports.list = async (req, res) => {
-    const resp = req.query.rwbId ? 
+    const resp = req.query.rwbId ?
         await kegQueries.findKegByRwbId(connection, req.query.rwbId)
         : await kegQueries.getKegs(connection);
     res.status(200).send(resp);
@@ -33,5 +34,11 @@ exports.create = async (req, res) => {
 
 exports.delete = async (req, res) => {
     const resp = await kegQueries.deleteKegById(connection, req.params.kegId);
+    res.status(200).send(resp);
+};
+
+exports.testList = async (req, res) => {
+    const resp = await kegQueries.testGetKegs(connection, req.params.kegId);
+    console.log(resp);
     res.status(200).send(resp);
 };

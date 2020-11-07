@@ -24,6 +24,7 @@ app.get('/kegs/:kegId', kegCtrl.get);
 app.put('/kegs/:kegId', kegCtrl.update);
 app.delete('/kegs/:kegId', kegCtrl.delete);
 app.post('/kegs', kegCtrl.create);
+app.get('/keks/:kegId', kegCtrl.testList);
 
 // Config data
 app.get('/config', configCtrl.list);
