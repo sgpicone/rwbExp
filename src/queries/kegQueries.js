@@ -6,21 +6,10 @@ concat('[', group_concat('{ "date": "', ksh.SaniDate, '", "chemical": "', sc.Nam
 concat('[', group_concat('{ "date": "', ksale.SaleDate, '", "chemical": "', ksale.FK_CustomerId, '" }'), ']') as saleHistory
 from rwbbc_data.keg_info k
 left join rwbbc_data.keg_wash_history kwh on k.RWBId = kwh.FK_RWBId
-left join rwbbc_data.Chemicals wc on kwh.FK_WashChemicalId = wc.Id
+left join rwbbc_data.chemicals wc on kwh.FK_WashChemicalId = wc.Id
 left join rwbbc_data.keg_sani_history ksh on k.RWBId = ksh.FK_RWBId
-left join rwbbc_data.Chemicals sc on ksh.FK_WashChemicalId = sc.Id
+left join rwbbc_data.chemicals sc on ksh.FK_WashChemicalId = sc.Id
 left join rwbbc_data.keg_sale_history ksale on k.RWBId = ksale.FK_RWBId`;
-
-const KEG_DETAIL = `SELECT 
-k.* 
-from rwbbc_data.keg_info k`;
-
-/*
-SELECT WashDate, GROUP_CONCAT(c.name) FROM keg_wash_history kwh 
-JOIN Chemicals c ON kwh.FK_WashChemicalId = c.Id 
-WHERE kwh.FK_RWBId = 'RWB-6-001'
-GROUP BY kwh.WashDate;
-*/
 
 const getKegs = async (connection) => {
     const rows = await connection.query(`SELECT k.*, kwh.LastWashDate, ksh.LastSaniDate, ksales.LastSaleDate, kt.Type
@@ -54,13 +43,13 @@ const getKegDetailsById = async (connection, kegId) => {
 
     SELECT WashDate, GROUP_CONCAT(c.name) as WashChemicals
     FROM rwbbc_data.keg_wash_history kwh 
-    JOIN rwbbc_data.Chemicals c ON kwh.FK_WashChemicalId = c.Id 
+    JOIN rwbbc_data.chemicals c ON kwh.FK_WashChemicalId = c.Id 
     WHERE kwh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
     GROUP BY kwh.WashDate;
 
     SELECT SaniDate, GROUP_CONCAT(c.name) as SaniChemicals
     FROM rwbbc_data.keg_sani_history ksh 
-    JOIN rwbbc_data.Chemicals c ON ksh.FK_SaniChemicalId = c.Id 
+    JOIN rwbbc_data.chemicals c ON ksh.FK_SaniChemicalId = c.Id 
     WHERE ksh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
     GROUP BY ksh.SaniDate;
 
@@ -68,20 +57,27 @@ const getKegDetailsById = async (connection, kegId) => {
     FROM rwbbc_data.keg_sale_history ksh 
     WHERE ksh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
     GROUP BY ksh.SaleDate;
+
+    SELECT FillDate, FK_BeerId as Beer
+    FROM rwbbc_data.keg_fill_history kfh 
+    WHERE kfh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
+    ORDER BY kfh.FillDate;
     `
     let results = await connection.query(query);
     let keg = results[0][0];
     keg.WashHistory = results[1];
     keg.SaniHistory = results[2];
     keg.SaleHistory = results[3];
+    keg.FillHistory = results[4];
     return keg;
 };
 
 const findKegByRwbId = async (connection, rwbId) => {
-    return await connection.query(
-        `${KEG_DETAIL_SELECT}
-    WHERE k.RWBId = '${rwbId}'
-    group by k.RWBId;`);
+    const res = await connection.query(
+        `SELECT Id FROM rwbbc_data.keg_info k
+    WHERE k.RWBId = '${rwbId}' LIMIT 1;`);
+    const id = res[0] ? res[0].Id : null;
+    return id ? getKegDetailsById(connection, id) : null;
 };
 
 const updateKegById = async (connection, id, keg) => {
@@ -98,7 +94,7 @@ const updateKegById = async (connection, id, keg) => {
 const createKeg = async (connection, keg) => {
     return await connection.query(`INSERT INTO rwbbc_data.keg_info 
         (RWBId, FactorySerial, ReceivedDate, Used, Notes, KegTypeId)
-        VALUE (keg.RWBId, keg.FactorySerial, keg.ReceivedDate, keg.Used, keg.Notes,
+        VALUE ('${keg.RWBId}', '${keg.FactorySerial}', STR_TO_DATE('${keg.ReceivedDate}', '%Y-%m-%d'), ${keg.Used}, '${keg.Notes}',
             (SELECT Id FROM rwbbc_data.keg_types WHERE Type = upper('${keg.KegType}')))`);
 };
 
@@ -109,14 +105,14 @@ const deleteKegById = async (connection, id) => {
 const addKegWashLog = async (connection, washLog) => {
     const query = `INSERT INTO rwbbc_data.keg_wash_history 
     (FK_RWBId, WashDate, FK_WashChemicalId) VALUES
-    (${washLog.RWBId}, ${washLog.washDate}, (SELECT Id from rwbbc_data.Chemicals WHERE Name = ${washLog.chemical}))`;
+    (${washLog.RWBId}, ${washLog.washDate}, (SELECT Id from rwbbc_data.chemicals WHERE Name = ${washLog.chemical}))`;
     return await connection.query(query);
 };
 
 const addKegSaniLog = async (connection, saniLog) => {
     const query = `INSERT INTO rwbbc_data.keg_sani_history 
     (FK_RWBId, SaniDate, FK_SaniChemicalId) VALUES
-    (${saniLog.RWBId}, ${saniLog.washDate}, (SELECT Id from rwbbc_data.Chemicals WHERE Name = ${saniLog.chemical}))`;
+    (${saniLog.RWBId}, ${saniLog.washDate}, (SELECT Id from rwbbc_data.chemicals WHERE Name = ${saniLog.chemical}))`;
     return await connection.query(query);
 }
 
@@ -136,7 +132,7 @@ const addKegSaleLog = async (connection, saleLog) => {
     return await connection.query(query);
 }
 
-const testGetKegs = async (connection, kegId) => {
+const getKegInfo = async (connection, kegId) => {
     const query = `SELECT 
     k.*
     from rwbbc_data.keg_info k
@@ -145,13 +141,13 @@ const testGetKegs = async (connection, kegId) => {
 
     SELECT WashDate, GROUP_CONCAT(c.name) as WashChemicals
     FROM rwbbc_data.keg_wash_history kwh 
-    JOIN rwbbc_data.Chemicals c ON kwh.FK_WashChemicalId = c.Id 
+    JOIN rwbbc_data.chemicals c ON kwh.FK_WashChemicalId = c.Id 
     WHERE kwh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
     GROUP BY kwh.WashDate;
 
     SELECT SaniDate, GROUP_CONCAT(c.name) as SaniChemicals
     FROM rwbbc_data.keg_sani_history ksh 
-    JOIN rwbbc_data.Chemicals c ON ksh.FK_SaniChemicalId = c.Id 
+    JOIN rwbbc_data.chemicals c ON ksh.FK_SaniChemicalId = c.Id 
     WHERE ksh.FK_RWBId = (SELECT RWBId FROM rwbbc_data.keg_info WHERE Id = ${kegId})
     GROUP BY ksh.SaniDate;
 
@@ -172,11 +168,12 @@ module.exports = {
     getKegs: getKegs,
     getKegById: getKegDetailsById,
     findKegByRwbId: findKegByRwbId,
+    createKeg: createKeg,
     updateKegById: updateKegById,
     deleteKegById: deleteKegById,
     addKegWashLog: addKegWashLog,
     addKegSaniLog: addKegSaniLog,
     addKegFillLog: addKegFillLog,
     addKegSaleLog: addKegSaleLog,
-    testGetKegs: testGetKegs
+    getKegInfo: getKegInfo
 };
