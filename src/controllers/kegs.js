@@ -18,27 +18,22 @@ exports.list = async (req, res) => {
 };
 
 exports.get = async (req, res) => {
-    const resp = await kegQueries.getKegById(connection, req.params.kegId);
+    const resp = await kegQueries.getKegInfo(connection, req.params.kegId);
     res.status(200).send(resp);
 };
 
 exports.update = async (req, res) => {
-    const resp = await kegQueries.updateKegById(connection, req.params.kegId, req.body.keg);
+    console.log(req.body);
+    const resp = await kegQueries.updateKegById(connection, req.params.kegId, req.body);
     res.status(200).send(resp);
 };
 
 exports.create = async (req, res) => {
-    const resp = await kegQueries.createKeg(connection, req.body.keg);
+    const resp = await kegQueries.createKeg(connection, req.body);
     res.status(204).send(resp);
 };
 
 exports.delete = async (req, res) => {
     const resp = await kegQueries.deleteKegById(connection, req.params.kegId);
-    res.status(200).send(resp);
-};
-
-exports.testList = async (req, res) => {
-    const resp = await kegQueries.testGetKegs(connection, req.params.kegId);
-    console.log(resp);
     res.status(200).send(resp);
 };
