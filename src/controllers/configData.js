@@ -2,12 +2,7 @@ const configQueries = require('../queries/configQueries');
 const dbFactory = require('../dbFactory');
 
 console.error(process.env.DB_HOST);
-var connection = dbFactory.makeDb({
-    host     : process.env.DB_HOST,
-    port     : process.env.DB_PORT,
-    user     : process.env.DB_USER,
-    password : process.env.DB_PASS
-});
+var connection = dbFactory.makeDb();
 
 exports.list = async (req, res) => {
     const resp = await configQueries.getConfigData(connection);

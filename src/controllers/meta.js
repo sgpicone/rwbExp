@@ -2,12 +2,7 @@ const metadataQueries = require('../queries/metadataQueries');
 const dbFactory = require('../dbFactory');
 
 console.error(process.env.DB_HOST);
-var connection = dbFactory.makeDb({
-    host     : process.env.DB_HOST,
-    port     : process.env.DB_PORT,
-    user     : process.env.DB_USER,
-    password : process.env.DB_PASS
-});
+var connection = dbFactory.makeDb();
 
 exports.listKegTypes = async (req, res) => {
     const resp = await metadataQueries.getKegTypes(connection);

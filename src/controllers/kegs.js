@@ -2,13 +2,7 @@ const kegQueries = require('../queries/kegQueries');
 const dbFactory = require('../dbFactory');
 
 console.error(process.env.DB_HOST);
-var connection = dbFactory.makeDb({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    multipleStatements: true
-});
+var connection = dbFactory.makeDb();
 
 exports.list = async (req, res) => {
     const resp = req.query.rwbId ?
@@ -18,7 +12,7 @@ exports.list = async (req, res) => {
 };
 
 exports.get = async (req, res) => {
-    const resp = await kegQueries.getKegInfo(connection, req.params.kegId);
+    const resp = await kegQueries.getKegById(connection, req.params.kegId);
     res.status(200).send(resp);
 };
 
@@ -37,3 +31,34 @@ exports.delete = async (req, res) => {
     const resp = await kegQueries.deleteKegById(connection, req.params.kegId);
     res.status(200).send(resp);
 };
+
+exports.relocate = async (req, res) => {
+    const resp = await kegQueries.updateKegLocation(connection, req.params.kegId, req.body);
+    res.status(200).send(resp);
+}
+
+exports.wash = async (req, res) => {
+    const resp = await kegQueries.addKegWashLog(connection, req.params.kegId, req.body);
+    res.status(200).send(resp);
+}
+
+exports.sani = async (req, res) => {
+    const resp = await kegQueries.addKegSaniLog(connection, req.params.kegId, req.body);
+    res.status(200).send(resp);
+}
+
+exports.fill = async (req, res) => {
+    const resp = await kegQueries.addKegFillLog(connection, req.params.kegId, req.body);
+    res.status(200).send(resp);
+}
+
+exports.breakdown = async (req, res) => {
+    const resp = await kegQueries.addKegBreakdownLog(connection, req.params.kegId, req.body);
+    res.status(200).send(resp);
+}
+
+exports.issue = async (req, res) => {
+    const resp = await kegQueries.addKegIssue(connection, req.params.kegId, req.body);
+    res.status(200).send(resp);
+}
+
