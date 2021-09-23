@@ -18,7 +18,7 @@ app.use(cors());
 //     res.status(200).send('hello world!');
 // });
 
-app.use('/', express.static(__dirname +'/rwb-admin-master/build/'));
+app.use('/', express.static(__dirname +'/client/build/'));
 
 // Kegs
 
