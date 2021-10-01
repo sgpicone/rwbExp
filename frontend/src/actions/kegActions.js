@@ -1,4 +1,4 @@
-import axios from 'axios';
+import KegDataService from '../services/kegs.service';
 
 import {
     GET_KEGS,
@@ -18,7 +18,7 @@ import {
 export const getKegs = () => async dispatch => {
     try {
         setLoading();
-        const response = await axios('http://localhost:8000/api/kegs');
+        const response = await KegDataService.getAll();
         console.log(response);
 
         dispatch({
@@ -27,5 +27,20 @@ export const getKegs = () => async dispatch => {
         });
     } catch (err) {
         console.error(`error fetching kegs: ${err}`);
+    }
+};
+
+export const getKeg = (rwbId) => async dispatch => {
+    try {
+        setLoading();
+        const response = await KegDataService.get(rwbId);
+        console.log(response);
+
+        dispatch({
+            type: GET_KEG,
+            payload: response.data
+        });
+    } catch (err) {
+        console.error(`error fetching keg ${rwbId}: ${err}`);
     }
 };

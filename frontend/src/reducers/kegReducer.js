@@ -19,18 +19,22 @@ const initialState = {
 };
 
 function kegReducer(state = initialState, action) {
-    switch (action.type) {
+    const { type, payload } = action;
+    console.log(payload);
+    switch (type) {
         case GET_KEGS:
             return {
                 ...state,
-                kegs: action.payload,
+                kegs: payload,
                 loading: false
             };
-        case 'GET_KEG':
-            return {
+        case GET_KEG:
+            let newStuff = {
                 ...state,
-                selectedKeg: state.kegs.map(keg => keg.rwbId === action.payload.rwbId ? action.payload : keg)
-            }
+                selectedKeg: payload
+            };
+            console.log(newStuff);
+            return newStuff;
         default:
             return {
                 ...state

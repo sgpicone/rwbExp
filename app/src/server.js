@@ -32,7 +32,7 @@ app.post('/api/kegs/:kegId/wash', jsonParser, kegCtrl.wash);
 app.post('/api/kegs/:kegId/sani', jsonParser, kegCtrl.sani);
 app.post('/api/kegs/:kegId/fill', jsonParser, kegCtrl.fill);
 app.post('/api/kegs/:kegId/breakdown', jsonParser, kegCtrl.breakdown);
-app.post('/api/kegs/:kegId/issue', jsonParser, kegCtrl.issue);
+app.post('/api/kegs/:kegId/log_issue', jsonParser, kegCtrl.issue);
 
 // Bulk Kegs
 app.post('/api/bulkkegs/relocate', jsonParser, bulkKegCtrl.relocate);

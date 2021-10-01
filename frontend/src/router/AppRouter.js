@@ -6,6 +6,7 @@ import BeerList from '../components/beers/BeerList';
 import KegList from '../components/kegs/KegList';
 import { getKegs } from '../actions/kegActions';
 import { connect } from 'react-redux';
+import KegDetail from '../components/kegs/KegDetail';
 
 const AppRouter = ({kegs, getKegs}) => {
     useEffect(() => {
@@ -20,8 +21,9 @@ const AppRouter = ({kegs, getKegs}) => {
         <div className="main-content">
           <Switch>
             <Route component={BeerList} path="/beers" exact={true} />
-            <Route component={KegList} path="/kegs" />
+            <Route component={KegList} path="/kegs" exact={true}/>
             <Route component={AddBeer} path="/beers/add" />
+            <Route component={KegDetail} path="/kegs/:kegId" />
           </Switch>
         </div>
       </div>
