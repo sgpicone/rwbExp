@@ -1,1 +1,2 @@
-DROP DATABASE 'rwbbc_data';
+use `rwbbc`;
+DROP DATABASE `rwbbc_data`;
