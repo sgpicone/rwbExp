@@ -1,0 +1,29 @@
+{
+    "dev": {
+        "driver": "mysql",
+        "host": {"ENV" : "RWB_DB_LOCAL_HOST"},
+        "user": {"ENV" : "RWB_DB_LOCAL_USER"},
+        "password": {"ENV" : "RWB_DB_LOCAL_PASSWORD"},
+        "multipleStatements": true,
+        "port": {"ENV" : "RWB_DB_LOCAL_PORT"},
+        "database": {"ENV" : "RWB_DB_LOCAL_DATABASE"}
+    },
+    "staging": {
+        "driver": "mysql",
+        "host": {"ENV" : "RWB_DB_STAGING_HOST"},
+        "user": {"ENV" : "RWB_DB_STAGING_USER"},
+        "password": {"ENV" : "RWB_DB_STAGING_PASSWORD"},
+        "multipleStatements": true,
+        "port": {"ENV" : "RWB_DB_STAGING_PORT"},
+        "database": {"ENV" : "RWB_DB_STAGING_DATABASE"}
+    },
+    "prod": {
+        "driver": "mysql",
+        "host": {"ENV" : "RWB_DB_PROD_HOST"},
+        "user": {"ENV" : "RWB_DB_PROD_USER"},
+        "password": {"ENV" : "RWB_DB_PROD_PASSWORD"},
+        "multipleStatements": true,
+        "port": {"ENV" : "RWB_DB_PROD_PORT"},
+        "database": {"ENV" : "RWB_DB_PROD_DATABASE"}
+    }
+}
