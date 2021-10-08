@@ -42,9 +42,13 @@ RWB_DB_LOCAL_HOST=localhost
 RWB_DB_LOCAL_USER=<your database user>
 RWB_DB_LOCAL_PASSWORD=<your database user's password>
 RWB_DB_LOCAL_PORT=<your database port>
-RWB_DB_LOCAL_DATABASE=rwbbc_data
+RWB_DB_LOCAL_DATABASE=<an existing database you can run the migrations from>
 ```
 
-To be perfectly honest I don't remember right this minute if you need `DB_XXX` or `RWB_DB_LOCAL_XXX`, but hell, put them both in there, can't hurt.
+To be perfectly honest I don't remember right this minute if you need `DB_XXX` or `RWB_DB_LOCAL_XXX`, but hell, put them both in there, can't hurt. The database migrations read from the `RWB_DB_LOCAL` variables. I think the app itself still reads the `DB_XXX` stuff.
 
 Now you can run `db-migrate up` to configure your database.
+
+Note that the `down`s don't really...work..totally right. They migrate down based on the migrations table of the database specified in your environment, which won't exist, so it'll always say you have nothing to run. I think there's probably a way with `db-migrate` to specify the database, but I haven't looked at it that deep yet.
+
+Anyawy. Should work 🤷‍♀️🤷‍♀️🤷‍♀️
