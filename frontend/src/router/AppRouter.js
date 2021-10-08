@@ -7,13 +7,9 @@ import KegList from '../components/kegs/KegList';
 import { getKegs } from '../actions/kegActions';
 import { connect } from 'react-redux';
 import KegDetail from '../components/kegs/KegDetail';
+import KegDashboard from '../components/kegs/KegDashboard';
 
 const AppRouter = ({kegs, getKegs}) => {
-    useEffect(() => {
-        getKegs();
-        console.log(kegs);
-    }, []);
-
   return (
     <BrowserRouter>
       <div>
@@ -21,7 +17,7 @@ const AppRouter = ({kegs, getKegs}) => {
         <div className="main-content">
           <Switch>
             <Route component={BeerList} path="/beers" exact={true} />
-            <Route component={KegList} path="/kegs" exact={true}/>
+            <Route component={KegDashboard} path="/kegs" exact={true}/>
             <Route component={AddBeer} path="/beers/add" />
             <Route component={KegDetail} path="/kegs/:kegId" />
           </Switch>

@@ -1,17 +1,19 @@
 import React, { useEffect, useState, Component } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import { getKeg } from '../../actions/kegActions';
-import HistoryTable from './HistoryTable';
+import HistoryTable from './tables/HistoryTable';
 import { columnMaps } from './utils/tableUtils';
 
-const KegDetail = ({ kegs, selectedKeg, loading, getKeg }) => {
+const KegDetail = () => {
   let { kegId: kegRwbId = null } = useParams();
+  const { kegs, selectedKeg, loading } = useSelector(state => state.keg);
+  const dispatch = useDispatch();
   const history = useHistory();
 
   useEffect(() => {
     if (!loading) {
-      getKeg(kegRwbId);
+      dispatch(getKeg(kegRwbId));
     }
   }, [kegRwbId]);
 
@@ -40,14 +42,5 @@ const KegDetail = ({ kegs, selectedKeg, loading, getKeg }) => {
     </div>
   );
 };
-const mapStateToProps = (state) => {
-  return {
-    kegs: state.keg.kegs,
-    selectedKeg: state.keg.selectedKeg
-  }
-};
 
-export default connect(
-  mapStateToProps,
-  { getKeg }
-)(KegDetail);
+export default KegDetail;

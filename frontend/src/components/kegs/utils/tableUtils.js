@@ -176,6 +176,24 @@ export const columnMaps = {
             type: columnTypes.BOOLEAN
         }
     },
+    KEG_TAP_TABLE: {
+        rwbId: {
+            hdr: "RWB Id",
+            type: columnTypes.STRING
+        },
+        lastFillBeer: {
+            hdr: "Last Fill Beer",
+            type: columnTypes.STRING
+        },
+        lastFillVolume: {
+            hdr: "Last Fill Volume",
+            type: columnTypes.NUMBER
+        },
+        location: {
+            hdr: "Location",
+            type: columnTypes.STRING
+        },
+    },
     KEG_LIST: [
         {
             Header: 'RWB ID',
