@@ -23,7 +23,7 @@ Regrettably, you have to run them separately for development, but they get deplo
 
 You'll need to create a mysql database to run locally, as well as setup a `.env` file with variables to point to the database.
 
-Download `mysql workbench` or something, I really don't care. Set up a mysql database on your machine.
+Download `mysql workbench` or something, I really don't care. Just set up a mysql database on your machine and it helps to have something like workbench to use to query it manually. **And make sure it's a 5.7.X database so you have environment parity with prod! Otherwise you WILL have weird encoding issues when you go to migrate!**
 
 Use `npx db-migrate up` in the `app` directory to run the migrations and setup the database locally. Note that before you do this. you'll likely need to at least have one database set up on your server and specified in your `.env` file. See below about how to set up the environment.
 
